@@ -7,6 +7,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import com.anter_apps.sunshine.R;
 
@@ -18,6 +20,7 @@ import java.util.List;
  * Created by mostafa on 26/02/16.
  */
 public class FragmentList extends Fragment {
+    private ArrayAdapter<String> mAdapter;
     public FragmentList(){
 
     }
@@ -38,6 +41,16 @@ public class FragmentList extends Fragment {
         };
         //convert array to list
         List<String> weekForecastList = new ArrayList<>(Arrays.asList(forecastList));
+
+        //initialize adapter
+        mAdapter = new ArrayAdapter<String>(
+                getActivity(),
+                R.layout.list_item_forecast,
+                R.id.list_item_forecast_textview,
+                weekForecastList);
+
+        ListView listView = (ListView) view.findViewById(R.id.listview_forecast);
+        listView.setAdapter(mAdapter);
 
         return view;
     }
