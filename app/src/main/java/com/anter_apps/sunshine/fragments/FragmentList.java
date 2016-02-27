@@ -1,6 +1,7 @@
 package com.anter_apps.sunshine.fragments;
 
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,7 +12,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.anter_apps.sunshine.R;
+import com.anter_apps.sunshine.httpManagment.HttpManager;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -52,6 +55,22 @@ public class FragmentList extends Fragment {
         ListView listView = (ListView) view.findViewById(R.id.listview_forecast);
         listView.setAdapter(mAdapter);
 
+        new DownloadFilesTask().execute();
+
         return view;
     }
+
+    private class DownloadFilesTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                HttpManager.downloadUrl("http://api.openweathermap.org/data/2.5/forecast/daily?lat=27.180037&lon=31.195682&mode=json&units=metric&cnt=7&appid=44db6a862fba0b067b1930da0d769e98");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+    }
+
+
 }
