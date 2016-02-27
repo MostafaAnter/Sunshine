@@ -5,7 +5,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -13,6 +17,9 @@ import android.widget.ListView;
 
 import com.anter_apps.sunshine.R;
 import com.anter_apps.sunshine.httpManagment.HttpManager;
+import com.anter_apps.sunshine.parser.JsonParser;
+
+import org.json.JSONException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,8 +31,31 @@ import java.util.List;
  */
 public class FragmentList extends Fragment {
     private ArrayAdapter<String> mAdapter;
+    private static String[] forecastList;
     public FragmentList(){
 
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // to handle menu event
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.forecastfragment, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_refresh){
+            new DownloadFilesTask().execute();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Nullable
@@ -55,20 +85,35 @@ public class FragmentList extends Fragment {
         ListView listView = (ListView) view.findViewById(R.id.listview_forecast);
         listView.setAdapter(mAdapter);
 
-        new DownloadFilesTask().execute();
 
         return view;
     }
 
-    private class DownloadFilesTask extends AsyncTask<Void, Void, Void> {
+    private class DownloadFilesTask extends AsyncTask<Void, Void, String[]> {
         @Override
-        protected Void doInBackground(Void... params) {
+        protected String[] doInBackground(Void... params) {
             try {
-                HttpManager.downloadUrl("http://api.openweathermap.org/data/2.5/forecast/daily?lat=27.180037&lon=31.195682&mode=json&units=metric&cnt=7&appid=44db6a862fba0b067b1930da0d769e98");
+                String[] list = new JsonParser().getWeatherDataFromJson(HttpManager.downloadUrl("http://api.openweathermap.org/data/2.5/forecast/daily?q=Asyut&cnt=7&mode=json&units=metrics&appid=44db6a862fba0b067b1930da0d769e98"), 7);
+                return list;
             } catch (IOException e) {
                 e.printStackTrace();
+                return null;
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return null;
             }
-            return null;
+
+        }
+
+        @Override
+        protected void onPostExecute(String[] strings) {
+            super.onPostExecute(strings);
+            if(strings != null){
+                mAdapter.clear();
+                for (String s:strings){
+                    mAdapter.add(s);
+                }
+            }
         }
     }
 

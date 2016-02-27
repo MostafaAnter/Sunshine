@@ -76,7 +76,6 @@ public class HttpManager {
                 }
             }
         }
-        Log.d("message", forecastJsonStr);
         return forecastJsonStr;
 
 
