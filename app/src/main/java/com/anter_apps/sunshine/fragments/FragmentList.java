@@ -1,20 +1,22 @@
 package com.anter_apps.sunshine.fragments;
 
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.anter_apps.sunshine.DetailActivity;
 import com.anter_apps.sunshine.R;
 import com.anter_apps.sunshine.httpManagment.HttpManager;
 import com.anter_apps.sunshine.parser.JsonParser;
@@ -75,7 +77,7 @@ public class FragmentList extends Fragment {
         //convert array to list
         List<String> weekForecastList = new ArrayList<>(Arrays.asList(forecastList));
 
-        //initialize adapter
+        //initialize adapter and add it to list view
         mAdapter = new ArrayAdapter<String>(
                 getActivity(),
                 R.layout.list_item_forecast,
@@ -84,6 +86,14 @@ public class FragmentList extends Fragment {
 
         ListView listView = (ListView) view.findViewById(R.id.listview_forecast);
         listView.setAdapter(mAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(getActivity(), DetailActivity.class);
+                intent.putExtra(Intent.EXTRA_TEXT, mAdapter.getItem(position));
+                startActivity(intent);
+            }
+        });
 
 
         return view;
